@@ -27,7 +27,7 @@ const User = require('./models/User');
 
 // JWT Secret
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret';
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:4201';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://courageous-taffy-9bd77b.netlify.app';
 
 // Session configuration for OAuth
 app.use(session({
@@ -62,7 +62,8 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
       "http://localhost:4200", 
       "http://localhost:4201", 
       "http://127.0.0.1:4201",
-      "https://chatgos-frontend.netlify.app"  // Default production
+      "https://chatgos-frontend.netlify.app",
+      "https://courageous-taffy-9bd77b.netlify.app"
     ];
 
 const corsOptions = {
@@ -664,7 +665,7 @@ app.put('/api/user/profile', authenticateToken, upload.single('avatar'), async (
     
     let avatarUrl;
     if (req.file) {
-      avatarUrl = `http://localhost:${PORT}/uploads/avatars/${req.file.filename}`;
+      avatarUrl = `${SERVER_URL}/uploads/avatars/${req.file.filename}`;
       console.log('Avatar uploaded:', avatarUrl);
     }
     
@@ -723,7 +724,7 @@ app.post('/api/upload', authenticateToken, uploadChatFile.single('file'), (req, 
 
     const type = req.body.type || 'file';
     const folder = type === 'image' ? 'images' : 'files';
-    const fileUrl = `http://localhost:${PORT}/uploads/${folder}/${req.file.filename}`;
+    const fileUrl = `${SERVER_URL}/uploads/${folder}/${req.file.filename}`;
 
     console.log('File uploaded:', fileUrl);
 

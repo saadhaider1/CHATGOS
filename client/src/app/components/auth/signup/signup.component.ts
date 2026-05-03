@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../services/auth.service';
+import { LoadingService } from '../../../services/loading.service';
 
 @Component({
   selector: 'app-signup',
@@ -24,7 +25,8 @@ export class SignupComponent {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private loadingService: LoadingService
   ) {}
 
   onSubmit() {
@@ -45,12 +47,14 @@ export class SignupComponent {
     }
 
     this.isLoading = true;
+    this.loadingService.show();
     this.errorMessage = '';
     this.successMessage = '';
 
     this.authService.signup(this.username, this.email, this.password).subscribe({
       next: (response) => {
         this.isLoading = false;
+        this.loadingService.hide();
         this.successMessage = 'Account created successfully! Redirecting to login...';
         setTimeout(() => {
           this.router.navigate(['/login']);
@@ -58,12 +62,14 @@ export class SignupComponent {
       },
       error: (error) => {
         this.isLoading = false;
+        this.loadingService.hide();
         this.errorMessage = error.error?.message || 'Signup failed. Please try again.';
       }
     });
   }
 
   signupWithGoogle() {
+    this.loadingService.show();
     this.authService.loginWithGoogle();
   }
 

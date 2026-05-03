@@ -1,0 +1,121 @@
+<div class="flex h-screen w-full bg-[#f0f2f5] p-6">
+  <!-- Sidebar -->
+  <app-sidebar class="w-20 border-r border-gray-100 flex-shrink-0 flex flex-col"></app-sidebar>
+
+  <!-- Main Content -->
+  <div class="flex-1 ml-6 bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col">
+    <!-- Header -->
+    <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <button (click)="goToProfile()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+          <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+        </button>
+        <h2 class="text-2xl font-bold text-gray-800">Settings</h2>
+      </div>
+      <button 
+        (click)="saveSettings()"
+        class="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors"
+      >
+        Save Changes
+      </button>
+    </div>
+
+    <!-- Settings Content -->
+    <div class="flex-1 overflow-y-auto p-6">
+      <div class="max-w-2xl mx-auto space-y-8">
+        
+        <!-- Notifications Section -->
+        <div class="bg-gray-50 rounded-xl p-6">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <span class="text-2xl">🔔</span> Notifications
+          </h3>
+          <div class="space-y-4">
+            <label class="flex items-center justify-between cursor-pointer">
+              <span class="text-gray-700">Message notifications</span>
+              <input type="checkbox" [(ngModel)]="notifications.messages" class="w-5 h-5 text-blue-500 rounded focus:ring-blue-500">
+            </label>
+            <label class="flex items-center justify-between cursor-pointer">
+              <span class="text-gray-700">Friend requests</span>
+              <input type="checkbox" [(ngModel)]="notifications.friendRequests" class="w-5 h-5 text-blue-500 rounded focus:ring-blue-500">
+            </label>
+            <label class="flex items-center justify-between cursor-pointer">
+              <span class="text-gray-700">Mentions</span>
+              <input type="checkbox" [(ngModel)]="notifications.mentions" class="w-5 h-5 text-blue-500 rounded focus:ring-blue-500">
+            </label>
+            <label class="flex items-center justify-between cursor-pointer">
+              <span class="text-gray-700">Sound effects</span>
+              <input type="checkbox" [(ngModel)]="notifications.sounds" class="w-5 h-5 text-blue-500 rounded focus:ring-blue-500">
+            </label>
+          </div>
+        </div>
+
+        <!-- Privacy Section -->
+        <div class="bg-gray-50 rounded-xl p-6">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <span class="text-2xl">🔒</span> Privacy
+          </h3>
+          <div class="space-y-4">
+            <label class="flex items-center justify-between cursor-pointer">
+              <span class="text-gray-700">Show online status</span>
+              <input type="checkbox" [(ngModel)]="privacy.showOnlineStatus" class="w-5 h-5 text-blue-500 rounded focus:ring-blue-500">
+            </label>
+            <label class="flex items-center justify-between cursor-pointer">
+              <span class="text-gray-700">Allow friend requests</span>
+              <input type="checkbox" [(ngModel)]="privacy.allowFriendRequests" class="w-5 h-5 text-blue-500 rounded focus:ring-blue-500">
+            </label>
+            <label class="flex items-center justify-between cursor-pointer">
+              <span class="text-gray-700">Profile visible to everyone</span>
+              <input type="checkbox" [(ngModel)]="privacy.profileVisible" class="w-5 h-5 text-blue-500 rounded focus:ring-blue-500">
+            </label>
+          </div>
+        </div>
+
+        <!-- Appearance Section -->
+        <div class="bg-gray-50 rounded-xl p-6">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <span class="text-2xl">🎨</span> Appearance
+          </h3>
+          <div class="space-y-4">
+            <label class="flex items-center justify-between cursor-pointer">
+              <span class="text-gray-700">Dark mode</span>
+              <input 
+                type="checkbox" 
+                [(ngModel)]="appearance.darkMode" 
+                (change)="onDarkModeChange()"
+                class="w-5 h-5 text-blue-500 rounded focus:ring-blue-500"
+              >
+            </label>
+            <label class="flex items-center justify-between cursor-pointer">
+              <span class="text-gray-700">Compact view</span>
+              <input 
+                type="checkbox" 
+                [(ngModel)]="appearance.compactView" 
+                (change)="onCompactViewChange()"
+                class="w-5 h-5 text-blue-500 rounded focus:ring-blue-500"
+              >
+            </label>
+          </div>
+        </div>
+
+        <!-- Account Actions -->
+        <div class="bg-red-50 rounded-xl p-6">
+          <h3 class="text-lg font-semibold text-red-800 mb-4">Account Actions</h3>
+          <div class="space-y-3">
+            <button 
+              (click)="logout()"
+              class="w-full py-3 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition-colors"
+            >
+              Logout
+            </button>
+            <button class="w-full py-3 border-2 border-red-300 text-red-600 hover:bg-red-100 font-medium rounded-lg transition-colors">
+              Delete Account
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

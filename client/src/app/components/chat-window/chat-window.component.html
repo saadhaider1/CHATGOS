@@ -1,0 +1,175 @@
+<div class="flex flex-col h-full bg-white">
+  <!-- Header -->
+  <header class="flex items-center justify-between px-8 py-4 border-b border-gray-100">
+    <div class="flex items-center gap-4">
+      <div class="w-10 h-10 rounded-full overflow-hidden">
+        <img [src]="recipientAvatar" alt="Avatar" class="w-full h-full object-cover">
+      </div>
+      <div>
+        <h3 class="text-sm font-semibold text-gray-900">{{ recipientName }}</h3>
+        <p class="text-[10px] text-gray-400" *ngIf="isTyping">typing...</p>
+        <p class="text-[10px] text-gray-400" *ngIf="!isTyping">@{{ recipientName.toLowerCase().replace(' ', '') }}</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <button 
+        (click)="startAudioCall()"
+        class="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+      >
+        <span class="text-lg">📞</span>
+        <span class="text-xs font-medium">Call</span>
+      </button>
+      <button 
+        (click)="startVideoCall()"
+        class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+      >
+        <span class="text-lg">📹</span>
+        <span class="text-xs font-medium">Video Call</span>
+      </button>
+      <button class="p-2 text-gray-400 hover:text-gray-600 text-xl">⋮</button>
+    </div>
+  </header>
+
+  <!-- Messages Area -->
+  <div class="flex-1 overflow-y-auto p-8 space-y-6 bg-gray-50/30">
+    <div *ngFor="let msg of messages; let i = index" class="flex items-end gap-3 max-w-[70%]" [class.ml-auto]="isFromMe(msg)">
+      <div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0" *ngIf="!isFromMe(msg)">
+        <img [src]="recipientAvatar" alt="Avatar" class="w-full h-full object-cover">
+      </div>
+      <div class="p-4 rounded-2xl text-sm leading-relaxed" 
+           [class.bg-blue-600]="isFromMe(msg)" 
+           [class.text-white]="isFromMe(msg)" 
+           [class.bg-white]="!isFromMe(msg)" 
+           [class.shadow-sm]="!isFromMe(msg)" 
+           [class.text-gray-800]="!isFromMe(msg)" 
+           [class.rounded-br-none]="isFromMe(msg)" 
+           [class.rounded-bl-none]="!isFromMe(msg)">
+        
+        <!-- Text Message -->
+        <ng-container *ngIf="msg.type === 'text' || !msg.type">
+          {{ msg.content }}
+        </ng-container>
+        
+        <!-- Image Message -->
+        <ng-container *ngIf="msg.type === 'image'">
+          <div class="mb-2">{{ msg.content }}</div>
+          <img 
+            [src]="msg.fileUrl" 
+            alt="Shared image" 
+            class="max-w-[300px] max-h-[200px] rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+            (click)="openImage(msg.fileUrl)"
+          >
+        </ng-container>
+        
+        <!-- File Message -->
+        <ng-container *ngIf="msg.type === 'file'">
+          <a 
+            [href]="msg.fileUrl" 
+            target="_blank" 
+            class="flex items-center gap-3 p-3 bg-white/20 rounded-lg hover:bg-white/30 transition-colors"
+            [class.text-white]="isFromMe(msg)"
+            [class.text-gray-800]="!isFromMe(msg)"
+          >
+            <span class="text-2xl">📄</span>
+            <div class="flex-1 min-w-0">
+              <div class="font-medium truncate">{{ msg.fileName }}</div>
+              <div class="text-xs opacity-70">{{ formatFileSize(msg.fileSize || 0) }}</div>
+            </div>
+            <span class="text-xl">⬇️</span>
+          </a>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input Area -->
+  <footer class="p-6 border-t border-gray-100 relative">
+    <!-- Hidden File Inputs -->
+    <input 
+      type="file" 
+      #fileInput 
+      (change)="onFileSelected($event)" 
+      class="hidden"
+    >
+    <input 
+      type="file" 
+      #imageInput 
+      (change)="onImageSelected($event)" 
+      accept="image/*"
+      class="hidden"
+    >
+
+    <!-- Uploading Indicator -->
+    <div *ngIf="isUploading" class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-sm flex items-center gap-2">
+      <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      Uploading...
+    </div>
+
+    <!-- Emoji Picker -->
+    <div 
+      *ngIf="showEmojiPicker" 
+      class="absolute bottom-full mb-2 left-4 bg-white rounded-xl shadow-lg border border-gray-200 p-4 z-10"
+    >
+      <div class="grid grid-cols-5 gap-2">
+        <button 
+          *ngFor="let emoji of commonEmojis" 
+          (click)="addEmoji(emoji)"
+          class="text-2xl hover:bg-gray-100 rounded p-1 transition-colors"
+        >
+          {{ emoji }}
+        </button>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-4 bg-gray-50 rounded-2xl px-4 py-2">
+      <!-- Attachment Button -->
+      <button 
+        (click)="triggerFileInput()"
+        class="p-2 text-gray-400 hover:text-blue-500 text-xl transition-colors"
+        title="Attach file"
+      >
+        📎
+      </button>
+      
+      <!-- Image Button -->
+      <button 
+        (click)="triggerImageInput()"
+        class="p-2 text-gray-400 hover:text-blue-500 text-xl transition-colors"
+        title="Send image"
+      >
+        🖼️
+      </button>
+      
+      <!-- Emoji Button -->
+      <button 
+        (click)="toggleEmojiPicker()"
+        class="p-2 text-gray-400 hover:text-blue-500 text-xl transition-colors"
+        [class.text-blue-500]="showEmojiPicker"
+        title="Add emoji"
+      >
+        😊
+      </button>
+      
+      <input 
+        type="text" 
+        [(ngModel)]="messageContent" 
+        (input)="onTyping()"
+        (keyup.enter)="sendMessage()"
+        placeholder="Type a message..." 
+        class="flex-1 bg-transparent border-none focus:ring-0 text-sm py-2"
+      >
+      
+      <button 
+        (click)="sendMessage()" 
+        class="p-2 text-blue-600 hover:scale-110 transition-transform text-xl"
+        [class.opacity-50]="!messageContent.trim()"
+        [disabled]="!messageContent.trim()"
+      >
+        ➤
+      </button>
+    </div>
+  </footer>
+</div>

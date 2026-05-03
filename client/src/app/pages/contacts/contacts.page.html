@@ -1,0 +1,169 @@
+<div class="flex h-screen w-full bg-[#f0f2f5] p-6">
+  <!-- Sidebar -->
+  <app-sidebar class="w-20 border-r border-gray-100 flex-shrink-0 flex flex-col"></app-sidebar>
+
+  <!-- Main Content -->
+  <div class="flex-1 ml-6 bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col">
+    <!-- Header -->
+    <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-bold text-gray-800">Contacts</h2>
+        <p class="text-sm text-gray-500 mt-1">{{ contacts.length }} contacts</p>
+      </div>
+      <button 
+        (click)="openAddFriendModal()"
+        class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors flex items-center gap-2"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+        </svg>
+        Add Friend
+      </button>
+    </div>
+
+    <!-- Search -->
+    <div class="px-6 py-4 border-b border-gray-100">
+      <div class="relative">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        <input 
+          type="text" 
+          placeholder="Search contacts..."
+          class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+        >
+      </div>
+    </div>
+
+    <!-- Contacts List -->
+    <div class="flex-1 overflow-y-auto p-6">
+      <div class="space-y-3">
+        <div 
+          *ngFor="let contact of contacts" 
+          class="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer group"
+          (click)="startChat(contact)"
+        >
+          <!-- Avatar -->
+          <div class="relative">
+            <div class="w-12 h-12 rounded-full overflow-hidden bg-blue-100">
+              <img [src]="contact.avatar" [alt]="contact.username" class="w-full h-full object-cover">
+            </div>
+            <div 
+              class="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white"
+              [class.bg-green-500]="contact.status === 'online'"
+              [class.bg-gray-400]="contact.status === 'offline'"
+            ></div>
+          </div>
+
+          <!-- Info -->
+          <div class="flex-1">
+            <h3 class="font-semibold text-gray-900">{{ contact.username }}</h3>
+            <p class="text-sm text-gray-500">{{ contact.email }}</p>
+          </div>
+
+          <!-- Status -->
+          <div class="text-right">
+            <span 
+              class="text-xs px-2 py-1 rounded-full"
+              [class.bg-green-100]="contact.status === 'online'"
+              [class.text-green-700]="contact.status === 'online'"
+              [class.bg-gray-100]="contact.status === 'offline'"
+              [class.text-gray-600]="contact.status === 'offline'"
+            >
+              {{ contact.status === 'online' ? 'Online' : 'Offline' }}
+            </span>
+          </div>
+
+          <!-- Action -->
+          <button class="p-2 text-gray-400 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Friend Modal -->
+<div 
+  *ngIf="showAddFriendModal" 
+  class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+  (click)="closeAddFriendModal()"
+>
+  <div 
+    class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6"
+    (click)="$event.stopPropagation()"
+  >
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-xl font-bold text-gray-800">Add Friend</h3>
+      <button (click)="closeAddFriendModal()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Search -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700 mb-2">Search by Email</label>
+      <div class="flex gap-2">
+        <input 
+          type="email" 
+          [(ngModel)]="searchEmail"
+          placeholder="Enter friend's email (e.g., john@gmail.com)"
+          class="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+          (keyup.enter)="searchByEmail()"
+        >
+        <button 
+          (click)="searchByEmail()"
+          [disabled]="isSearching"
+          class="px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-colors disabled:opacity-50"
+        >
+          <span *ngIf="!isSearching">Search</span>
+          <span *ngIf="isSearching">...</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="searchError" class="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">
+      {{ searchError }}
+    </div>
+
+    <!-- Success -->
+    <div *ngIf="successMessage" class="mb-4 p-3 bg-green-50 text-green-600 rounded-lg text-sm">
+      {{ successMessage }}
+    </div>
+
+    <!-- Search Results -->
+    <div *ngIf="searchResults.length > 0" class="space-y-3">
+      <p class="text-sm text-gray-500">Found {{ searchResults.length }} user(s):</p>
+      <div 
+        *ngFor="let user of searchResults" 
+        class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl"
+      >
+        <img [src]="user.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + user.username" class="w-12 h-12 rounded-full">
+        <div class="flex-1">
+          <h4 class="font-semibold text-gray-800">{{ user.username }}</h4>
+          <p class="text-sm text-gray-500">{{ user.email }}</p>
+        </div>
+        <button 
+          (click)="addFriend(user)"
+          class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors"
+        >
+          Add
+        </button>
+      </div>
+    </div>
+
+    <!-- Tips -->
+    <div class="mt-6 p-4 bg-blue-50 rounded-xl">
+      <p class="text-sm text-blue-700">
+        💡 <strong>Tip:</strong> Enter your friend's registered email address to find them on ChatGos.
+      </p>
+    </div>
+  </div>
+</div>
